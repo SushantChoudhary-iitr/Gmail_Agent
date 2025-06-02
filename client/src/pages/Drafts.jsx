@@ -9,7 +9,7 @@ function Drafts() {
         console.error('No user email found');
         return;
       }
-      await axios.post('http://localhost:3001/generate-drafts', { email: userEmail });
+      await axios.post('https://gmail-agent-49ni.onrender.com/generate-drafts', { email: userEmail });
       // You might want to add a success notification here
     } catch (error) {
       console.error('Failed to generate drafts:', error);

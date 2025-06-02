@@ -7,7 +7,7 @@ function Preferences() {
 
   const handleSubmit = async () => {
     try {
-      await axios.post('http://localhost:3001/preferences', { designation: draftPrompt} );
+      await axios.post('https://gmail-agent-49ni.onrender.com/preferences', { designation: draftPrompt} );
       // You might want to add a success notification here
     } catch (error) {
       console.error('Failed to save preferences:', error);

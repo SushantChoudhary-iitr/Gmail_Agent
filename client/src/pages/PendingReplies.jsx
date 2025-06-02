@@ -26,7 +26,7 @@ function PendingReplies() {
 
   const fetchEmails = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/pending-replies');
+      const response = await axios.get('https://gmail-agent-49ni.onrender.com/pending-replies');
       setEmails(response.data);
       setLoading(false);
     } catch (error) {
@@ -37,7 +37,7 @@ function PendingReplies() {
 
   const handleSendReply = async (email) => {
     try {
-      await axios.post('http://localhost:3001/reply-email', { toEmail : email.from, reply : email.suggestedReply });
+      await axios.post('https://gmail-agent-49ni.onrender.com/reply-email', { toEmail : email.from, reply : email.suggestedReply });
       setOpenSnackbar(true);
       fetchEmails();
     } catch (error) {
