@@ -1,0 +1,9 @@
+#node modules
+node_modules/
+
+#enviornment variables
+.env
+
+token.json
+
+test.js
