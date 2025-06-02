@@ -35,7 +35,7 @@ app.use('/', emailRoutes);
 app.use('/', preferenceRoutes);
 app.use('/', generateDrafts);
 
-cron.schedule('*/1 * * * *', () => {
+cron.schedule('*/5 * * * *', () => {
   console.log('⏱️ Running draft generation job...');
   generateDraftsForAllUsers();
 });
