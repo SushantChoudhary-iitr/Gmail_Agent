@@ -80,7 +80,7 @@ for (const msg of messages) {
     req.session.user = { email: profile.email };
 
     //res.send("✅ OAuth consent successful. You can now use the app.");
-    res.redirect(`http://localhost:5173/home?email=${userEmail}`)
+    res.redirect(`https://gmailagent.netlify.app/home?email=${userEmail}`)
   } catch (error) {
     console.error("Error during OAuth callback:", error);
     res.status(500).send("❌ OAuth failed.");
