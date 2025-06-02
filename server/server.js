@@ -30,7 +30,7 @@ app.use(express.json());
 }));*/
 const allowedOrigins = [
   'http://localhost:5173',              // for local dev
-  'https://my-app.netlify.app'          // for production Netlify frontend
+  'https://gmailagent.netlify.app'          // for production Netlify frontend
 ];
 
 app.use(cors({
