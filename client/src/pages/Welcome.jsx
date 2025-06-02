@@ -4,7 +4,7 @@ import WelcomeAppBar from '../components/WelcomeAppBar';
 function Welcome() {
   const handleGoogleSignIn = () => {
     // Redirect to backend auth endpoint
-    window.location.href = 'http://localhost:3001/auth';
+    window.location.href = 'https://gmail-agent-49ni.onrender.com/auth';
   };
 
   return (
