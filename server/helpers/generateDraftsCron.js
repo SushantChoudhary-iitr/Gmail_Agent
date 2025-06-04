@@ -124,7 +124,7 @@ async function generateDraftsForAllUsers() {
           console.log(`generating for ${email}`);
 
           console.log(`FROM: ${from}`);
-          console.log(`SUBJECT: ${subject}`);
+          console.log(`BODY: ${decodedBody}`);
 
         const isAutoEmail =
             from.toLowerCase().includes('noreply') ||
