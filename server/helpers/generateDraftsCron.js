@@ -86,7 +86,7 @@ async function generateDraftsForAllUsers() {
 
       const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
       const labelId = await getOrCreateLabel(gmail);
-      const lastChecked = lastRepliedTimestamp || new Date('2024-05-01').getTime();
+      const lastChecked = lastRepliedTimestamp || new Date('2025-05-01').getTime();
 
       const messagesRes = await gmail.users.messages.list({
         userId: 'me',
@@ -172,7 +172,7 @@ async function generateDraftsForAllUsers() {
         await User.findOneAndUpdate(
           { email },
           {
-            $set: { lastRepliedTimestamp: Date.now() },
+            //$set: { lastRepliedTimestamp: Date.now() },
             $push: {
               chatHistory: [
                 { role: 'user', content: `reply this like me\n\n${decodedBody}` },
@@ -184,6 +184,13 @@ async function generateDraftsForAllUsers() {
 
         console.log(`✅ Draft generated for ${email}`);
       }
+
+      await User.findOneAndUpdate(
+        { email},
+        {
+          $set: { lastRepliedTimestamp: Date.now() }
+        }
+      );
     } catch (err) {
       console.error(`❌ Failed for user ${email}:`, err.message);
     }
