@@ -137,7 +137,7 @@ async function generateDraftsForAllUsers() {
           model: 'gpt-4o',
           messages: [
             { role: 'system', content: `Generate emails on behalf of ${designation}, and learn from previous replies \n\n ${pastReplies.join('\n---\n')}` },
-            { role: 'user', content: `Reply to this email only if needed:\n\n${decodedBody}` },
+            { role: 'user', content: `Reply to this email only if needed, avoid mails from social media platforms or any company commercials and FYIs, i am also sharing the from emailID: ${from}, and here is the email body:\n\n${decodedBody}` },
           ],
         });
 
