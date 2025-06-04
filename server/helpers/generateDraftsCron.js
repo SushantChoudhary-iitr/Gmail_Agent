@@ -145,6 +145,8 @@ async function generateDraftsForAllUsers() {
           ],
         });
 
+        console.log( requireReply.choices[0].message.content.trim().toLowerCase() );
+
         if( requireReply.choices[0].message.content.trim().toLowerCase() === 'no' ) continue;
 
         const aiResponse = await openai.chat.completions.create({
