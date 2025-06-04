@@ -115,6 +115,7 @@ async function generateDraftsForAllUsers() {
         const subject = headers.find(h => h.name === 'Subject')?.value || '';
         const bodyData =
           fullMsg.data.payload.parts?.find(p => p.mimeType === 'text/plain')?.body?.data ||
+          fullMsg.data.payload.parts?.find(p => p.mimeType === 'text/html')?.body?.data ||
           fullMsg.data.payload.body?.data;
 
         const decodedBody = bodyData
@@ -136,11 +137,21 @@ async function generateDraftsForAllUsers() {
 
         if (isAutoEmail) continue;
 
+        const requireReply = await openai.chat.completions.create({
+          model : 'gpt-4o',
+          messages:[
+              {role: 'system', content: 'you are an Email assistant, if an email requires a reply answer in yes or no'},
+              {role:'user', content: `from: ${from}\n subject: ${subject}\nbody: ${decodedBody} \n reply only if its from a real person, and its asking a question or needs a folow up response, No need to reply if its a social media notification or some company commercial, newsletter, ad, or system alert. /n does it need a reply?`},
+          ],
+        });
+
+        if( requireReply.choices[0].message.content.trim().toLowerCase() === 'no' ) continue;
+
         const aiResponse = await openai.chat.completions.create({
           model: 'gpt-4o',
           messages: [
             { role: 'system', content: `Generate emails on behalf of ${designation}, and learn from previous replies \n\n ${pastReplies.join('\n---\n')}` },
-            { role: 'user', content: `Given this email below, generate a reply only if it's a genuine email from a person, asking something, or requiring action. Skip it if it's just a social media notification, ad, or generic system update or any company commercials, i am also sharing the from emailID: ${from}, and here is the email body:\n\n${decodedBody}` },
+            { role: 'user', content: `Reply to this:\n\n${decodedBody}` },
           ],
         });
 
