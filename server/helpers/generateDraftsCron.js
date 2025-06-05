@@ -4,7 +4,7 @@ const User = require('../models/users'); // adjust path if different
 const checkIfRepliedOrDrafted = require('./checkReplyDraft');
 const makeRawReply = require('./makeRawReply');
 const { OpenAI } = require('openai');
-const { htmlToText } = reqiure('html-to-text');
+const { htmlToText } = require('html-to-text');
 require("dotenv").config();
 
 
