@@ -121,7 +121,7 @@ async function generateDraftsForAllUsers() {
           fullMsg.data.payload.body?.data ||
           htmlPart?.body?.data;
 
-        const decodedBody = bodyData
+        let decodedBody = bodyData
           ? Buffer.from(bodyData, 'base64').toString('utf-8')
           : '(No message body)';
 
