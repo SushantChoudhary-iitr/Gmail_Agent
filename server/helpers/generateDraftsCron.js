@@ -92,7 +92,7 @@ async function generateDraftsForAllUsers() {
       const messagesRes = await gmail.users.messages.list({
         userId: 'me',
         q: `is:inbox after:${Math.floor(lastChecked / 1000)}`,
-        maxResults: 10,
+        maxResults: 20,
       });
 
 
@@ -144,31 +144,30 @@ async function generateDraftsForAllUsers() {
 
         if (isAutoEmail) continue;
 
-        const requireReply = await openai.chat.completions.create({
-          model : 'gpt-4o',
-          messages:[
-              {role: 'system', content: 'you are an Email assistant, if an email requires a reply answer in yes or no'},
-              {role:'user', content: `from: ${from}\n subject: ${subject}\nbody: ${decodedBody} \n reply only if its from a real person, and its asking a question or needs a folow up response, No need to reply if its a social media notification or some company commercial, newsletter, ad, or system alert. /n does it need a reply?`},
-          ],
-        });
-
-        console.log( requireReply.choices[0].message.content.trim().toLowerCase() );
-
-        if( requireReply.choices[0].message.content.trim().toLowerCase() === 'no' ) continue;
-
-        const aiResponse = await openai.chat.completions.create({
-          model: 'gpt-4o',
-          messages: [
-            { role: 'system', content: `Generate emails on behalf of ${designation}, and learn from previous replies \n\n ${pastReplies.join('\n---\n')}` },
-            { role: 'user', content: `Reply to this:\n\n${decodedBody}` },
-          ],
-        });
-
-        const aiReply = aiResponse.choices[0].message.content;
-        const raw = await makeRawReply(from, email, subject, aiReply, fullMsg.data.threadId);
-
-        console.log("Raw Email String (decoded):", Buffer.from(raw, 'base64').toString('utf-8'));
-
+          const requireReply = await openai.chat.completions.create({
+            model : 'gpt-4o',
+            messages:[
+                {role: 'system', content: 'you are an Email assistant, if an email requires a reply answer in yes or no'},
+                {role:'user', content: `from: ${from}\n subject: ${subject}\nbody: ${decodedBody} \n reply only if its from a real person, and its asking a question or needs a folow up response, No need to reply if its a social media notification or some company commercial, newsletter, ad, or system alert. /n does it need a reply?`},
+            ],
+          });
+  
+          console.log( requireReply.choices[0].message.content.trim().toLowerCase() );
+  
+          if( requireReply.choices[0].message.content.trim().toLowerCase() === 'no' ) continue;
+  
+          const aiResponse = await openai.chat.completions.create({
+            model: 'gpt-4o',
+            messages: [
+              { role: 'system', content: `Generate emails on behalf of ${designation}, and learn from previous replies \n\n ${pastReplies.join('\n---\n')}` },
+              { role: 'user', content: `Reply to this:\n\n${decodedBody}` },
+            ],
+          });
+  
+          const aiReply = aiResponse.choices[0].message.content;
+          const raw = await makeRawReply(from, email, subject, aiReply, fullMsg.data.threadId);
+  
+          console.log("Raw Email String (decoded):", Buffer.from(raw, 'base64').toString('utf-8'));
 
         await gmail.users.drafts.create({
           userId: 'me',
@@ -192,7 +191,7 @@ async function generateDraftsForAllUsers() {
         await User.findOneAndUpdate(
           { email },
           {
-            //$set: { lastRepliedTimestamp: Date.now() },
+            $set: { lastRepliedTimestamp: Date.now() },
             $push: {
               chatHistory: [
                 { role: 'user', content: `reply this like me\n\n${decodedBody}` },
@@ -205,12 +204,6 @@ async function generateDraftsForAllUsers() {
         console.log(`✅ Draft generated for ${email}`);
       }
 
-      await User.findOneAndUpdate(
-        { email},
-        {
-          $set: { lastRepliedTimestamp: Date.now() }
-        }
-      );
     } catch (err) {
       console.error(`❌ Failed for user ${email}:`, err.message);
     }
