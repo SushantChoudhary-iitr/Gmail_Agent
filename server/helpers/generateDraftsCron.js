@@ -168,7 +168,7 @@ async function generateDraftsForAllUsers() {
           const aiReply = aiResponse.choices[0].message.content;
           const raw = await makeRawReply(from, email, subject, aiReply, fullMsg.data.threadId);
           
-          console.log("Number of tokens used: ", aiReply.usage.total_tokens);
+          console.log("Number of tokens used: ", aiResponse.usage.total_tokens);
           console.log("Raw Email String (decoded):", Buffer.from(raw, 'base64').toString('utf-8'));
 
         await gmail.users.drafts.create({
