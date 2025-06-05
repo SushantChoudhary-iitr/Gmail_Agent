@@ -4,6 +4,7 @@ const User = require('../models/users'); // adjust path if different
 const checkIfRepliedOrDrafted = require('./checkReplyDraft');
 const makeRawReply = require('./makeRawReply');
 const { OpenAI } = require('openai');
+const { htmlToText } = reqiure('html-to-text');
 require("dotenv").config();
 
 
@@ -113,14 +114,20 @@ async function generateDraftsForAllUsers() {
         const headers = fullMsg.data.payload.headers;
         const from = headers.find(h => h.name === 'From')?.value || '';
         const subject = headers.find(h => h.name === 'Subject')?.value || '';
-        const bodyData =
-          fullMsg.data.payload.parts?.find(p => p.mimeType === 'text/plain')?.body?.data ||
-          fullMsg.data.payload.parts?.find(p => p.mimeType === 'text/html')?.body?.data ||
-          fullMsg.data.payload.body?.data;
+        const textPart = fullMsg.data.payload.parts?.find(p => p.mimeType === 'text/plain');
+        const htmlPart = fullMsg.data.payload.parts?.find(p => p.mimeType === 'text/html');
+        const bodyData = 
+          textPart?.body?.data ||
+          fullMsg.data.payload.body?.data ||
+          htmlPart?.body?.data;
 
         const decodedBody = bodyData
           ? Buffer.from(bodyData, 'base64').toString('utf-8')
           : '(No message body)';
+
+          if (!textPart && !fullMsg.data.payload.body?.data && htmlPart) {
+            decodedBody = htmlToText(decodedBody); // Convert HTML to plain text
+          }
 
           console.log(`generating for ${email}`);
 

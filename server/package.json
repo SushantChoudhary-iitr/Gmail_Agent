@@ -17,6 +17,7 @@
     "express-session": "^1.18.1",
     "fs": "^0.0.1-security",
     "googleapis": "^149.0.0",
+    "html-to-text": "^9.0.5",
     "mongoose": "^8.15.1",
     "node-cron": "^4.1.0",
     "openai": "^4.103.0"
