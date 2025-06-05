@@ -151,8 +151,9 @@ async function generateDraftsForAllUsers() {
                 {role:'user', content: `from: ${from}\n subject: ${subject}\nbody: ${decodedBody} \n reply only if its from a real person, and its asking a question or needs a folow up response, No need to reply if its a social media notification or some company commercial, newsletter, ad, or system alert. /n does it need a reply?`},
             ],
           });
-  
-          console.log( requireReply.choices[0].message.content.trim().toLowerCase() );
+          
+          console.log("Number of tokens used: ", requireReply.usage.total_tokens);
+          console.log( "!st verification: ", requireReply.choices[0].message.content.trim().toLowerCase() );
   
           if( requireReply.choices[0].message.content.trim().toLowerCase() === 'no' ) continue;
   
@@ -166,7 +167,8 @@ async function generateDraftsForAllUsers() {
   
           const aiReply = aiResponse.choices[0].message.content;
           const raw = await makeRawReply(from, email, subject, aiReply, fullMsg.data.threadId);
-  
+          
+          console.log("Number of tokens used: ", aiReply.usage.total_tokens);
           console.log("Raw Email String (decoded):", Buffer.from(raw, 'base64').toString('utf-8'));
 
         await gmail.users.drafts.create({
