@@ -142,7 +142,16 @@ async function generateDraftsForAllUsers() {
             subject.toLowerCase().includes('newsletter') ||
             subject.toLowerCase().includes('auto');
 
-        if (isAutoEmail) continue;
+        if (isAutoEmail){
+          await User.findOneAndUpdate(
+            { email },
+            {
+              $set: { lastRepliedTimestamp: Date.now() }
+            }
+          );
+
+          continue;
+        }
 
           const requireReply = await openai.chat.completions.create({
             model : 'gpt-4o',
@@ -153,9 +162,18 @@ async function generateDraftsForAllUsers() {
           });
           
           console.log("Number of tokens used: ", requireReply.usage.total_tokens);
-          console.log( "!st verification: ", requireReply.choices[0].message.content.trim().toLowerCase() );
+          console.log( "1st verification: ", requireReply.choices[0].message.content.trim().toLowerCase() );
   
-          if( requireReply.choices[0].message.content.trim().toLowerCase() === 'no' ) continue;
+          if( requireReply.choices[0].message.content.trim().toLowerCase() === 'no' ){
+            await User.findOneAndUpdate(
+              { email },
+              {
+                $set: { lastRepliedTimestamp: Date.now() }
+              }
+            );
+  
+            continue;
+          }
   
           const aiResponse = await openai.chat.completions.create({
             model: 'gpt-4o',
