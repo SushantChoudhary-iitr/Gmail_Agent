@@ -179,7 +179,7 @@ async function generateDraftsForAllUsers() {
           const aiResponse = await openai.chat.completions.create({
             model: 'gpt-4o',
             messages: [
-              { role: 'system', content: `Write a reply as: \n${designation}, matching the style of these past replies:\n\n${pastReplies.join('\n---\n')}. match the tone,be clear, concise as this is a reply in the SAME THREAD so, Avoid being too friendly, formal, pompous, or wordy` },
+              { role: 'system', content: `Write a reply as: \n${designation}, matching the style of these past replies:\n\n${pastReplies.join('\n---\n')}. match the tone,be clear, EXTREMELY concise as this is a reply in the SAME THREAD so, Avoid being too friendly, formal, pompous, or wordy` },
               { role: 'user', content: `Reply to this:\n\n${decodedBody}` },
             ],
           });
