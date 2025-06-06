@@ -138,8 +138,9 @@ async function generateDraftsForAllUsers() {
             from.toLowerCase().includes('noreply') ||
             from.toLowerCase().includes('no-reply') ||
             from.toLowerCase().includes('donotreply') ||
+            from.toLowerCase().includes('notification') ||
             subject.toLowerCase().includes('receipt') ||
-            subject.toLowerCase().includes('newsletter') ||
+            subject.toLowerCase().includes('notification') ||
             subject.toLowerCase().includes('auto');
 
         if (isAutoEmail){
@@ -178,7 +179,7 @@ async function generateDraftsForAllUsers() {
           const aiResponse = await openai.chat.completions.create({
             model: 'gpt-4o',
             messages: [
-              { role: 'system', content: `Write a reply as: \n${designation}, matching the style of these past replies:\n\n${pastReplies.join('\n---\n')}. Be clear, concise, and match the tone. Avoid being too friendly, formal, pompous, or wordy` },
+              { role: 'system', content: `Write a reply as: \n${designation}, matching the style of these past replies:\n\n${pastReplies.join('\n---\n')}. match the tone,be clear, concise as this is a reply in the SAME THREAD so, Avoid being too friendly, formal, pompous, or wordy` },
               { role: 'user', content: `Reply to this:\n\n${decodedBody}` },
             ],
           });
