@@ -178,7 +178,7 @@ async function generateDraftsForAllUsers() {
           const aiResponse = await openai.chat.completions.create({
             model: 'gpt-4o',
             messages: [
-              { role: 'system', content: `Generate emails on behalf of ${designation}, and learn from previous replies \n\n ${pastReplies.join('\n---\n')}` },
+              { role: 'system', content: `Write a reply as: \n${designation}, matching the style of these past replies:\n\n${pastReplies.join('\n---\n')}. Be clear, concise, and match the tone. Avoid being too friendly, formal, pompous, or wordy` },
               { role: 'user', content: `Reply to this:\n\n${decodedBody}` },
             ],
           });
