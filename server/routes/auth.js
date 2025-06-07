@@ -5,6 +5,12 @@ const { google, oAuth2Client } = require('../helpers/gmailClient');
 //const generateDraftsForAllUsers = require('../helpers/generateDraftsCron');
 const User = require('../models/users');
 const session = require('express-session');
+const EmailReplyParser  = require('email-reply-parser');
+
+function extractVisibleReply(body){
+  const parser = new EmailReplyParser();
+  return parser.read(body).getVisibleText().trim();
+}
 
 // Step 1: Start OAuth flow
 router.get("/auth", (req, res) => {
@@ -40,7 +46,7 @@ const listRes = await gmail.users.messages.list({
   userId: 'me',
   labelIds: ['SENT'],
   q: `after:${formattedDate}`,
-  maxResults: 20,
+  maxResults: 30,
 });
 
     const messages = listRes.data.messages || [];
@@ -59,7 +65,8 @@ for (const msg of messages) {
   const bodyPart = parts.find(p => p.mimeType === 'text/plain' || p.mimeType === 'text/html');
   if (bodyPart?.body?.data) {
     const decoded = Buffer.from(bodyPart.body.data, 'base64').toString('utf8');
-    pastReplies.push(decoded);
+    const decodedParsed = extractVisibleReply(decoded);
+    pastReplies.push(decodedParsed);
   }
 }
 
@@ -71,7 +78,7 @@ for (const msg of messages) {
           tokens,
           lastRepliedTimestamp: Date.now() - 7 * 24 * 60 * 60 * 1000 // 1 week ago
          },
-        $push: { pastReplies: { $each: pastReplies.slice(0, 10) } } // store up to 10 replies
+        $push: { pastReplies: { $each: pastReplies.slice(0, 30) } } // store up to 10 replies
       },
       { new: true, upsert: true }
     );
