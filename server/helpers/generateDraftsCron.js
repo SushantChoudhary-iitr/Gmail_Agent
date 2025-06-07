@@ -121,13 +121,14 @@ async function generateDraftsForAllUsers() {
           fullMsg.data.payload.body?.data ||
           htmlPart?.body?.data;
 
-        let decodedBody = bodyData
+        const rawBody = bodyData
           ? Buffer.from(bodyData, 'base64').toString('utf-8')
           : '(No message body)';
 
-          if (!textPart && !fullMsg.data.payload.body?.data && htmlPart) {
-            decodedBody = htmlToText(decodedBody); // Convert HTML to plain text
-          }
+          /*if (!textPart && !fullMsg.data.payload.body?.data && htmlPart) {
+            const decodedBody = htmlToText(rawBody); // Convert HTML to plain text
+          }*/
+         const decodedBody = htmlToText(rawBody);
 
           console.log(`generating for ${email}`);
 
