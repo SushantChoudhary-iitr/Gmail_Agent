@@ -159,10 +159,21 @@ async function generateDraftsForAllUsers() {
           continue;
         }
 
+        /*if(decodedBody.includes("No message body")){
+          await User.findOneAndUpdate(
+            { email },
+            {
+              $set: { lastRepliedTimestamp: Date.now() }
+            }
+          );
+
+          continue;
+        }*/
+
           const requireReply = await openai.chat.completions.create({
             model : 'gpt-4o',
             messages:[
-                {role: 'system', content: 'you are an Email assistant, if an email requires a reply answer in yes or no, no punctuation marks'},
+                {role: 'system', content: 'you are an Email assistant, if an email requires a reply answer in yes or no, no punctuation marks.For no message body reply no'},
                 {role:'user', content: `from: ${from}\n subject: ${subject}\nbody: ${decodedBody} \n reply only if its from a real person, and its asking a question or needs a folow up response, No need to reply if its a social media notification or some company commercial, newsletter, ad, or system alert. /n does it need a reply?`},
             ],
           });
