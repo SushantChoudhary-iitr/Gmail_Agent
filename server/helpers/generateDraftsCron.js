@@ -72,12 +72,16 @@ async function getOrCreateLabel(gmail, labelName = 'toReply') {
 async function generateDraftsForAllUsers() {
   const users = await User.find({});
   for (const user of users) {
-    const { email, tokens, designation, pastReplies, lastRepliedTimestamp } = user;
+    const { email, tokens, designation, pastReplies, lastRepliedTimestamp, characterSummary } = user;
 
     if (!designation) {
         console.log(`⏭️ Skipping ${email} — no designation set.`);
         continue;
       }
+    if(!characterSummary){
+      console.log(`⏭️ skipping: ${email} No characterSummary`);
+      continue;
+    }
     console.log(` first call -> generating for ${email}`);
 
     try {
@@ -180,7 +184,7 @@ async function generateDraftsForAllUsers() {
           const aiResponse = await openai.chat.completions.create({
             model: 'gpt-4o',
             messages: [
-              { role: 'system', content: `Write a reply as: \n${designation}, match the style and try to mimic on the basis of past replies:\n\n${pastReplies.join('\n---\n')}. match the tone,be clear, EXTREMELY concise as this is a reply in the SAME THREAD so, Avoid being too friendly, formal, pompous, or wordy` },
+              { role: 'system', content: `Write a reply as: \n${designation}, match the style and try to mimic on the basis of characterSummary:\n\n${characterSummary.join('\n---\n')}. match the tone,be clear, further cut down the "length" as this is a reply in the SAME THREAD so, Avoid being too formal, pompous, or wordy` },
               { role: 'user', content: `Reply to this:\n\n${decodedBody}` },
             ],
           });

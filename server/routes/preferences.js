@@ -7,12 +7,12 @@ const generateDraftsForAllUsers = require('../helpers/generateDraftsCron');
 router.post('/preferences', async (req, res) => {
     console.log("HELLO");
   //const email = req.session?.user?.email;
-  const  { designation }  = req.body;
+  const  { designation, email }  = req.body;
 
   const gmail = google.gmail({ version: 'v1', auth: oAuth2Client })
 
-  const profile = await gmail.users.getProfile({ userId: 'me' });
-  const email = profile.data.emailAddress;
+  //const profile = await gmail.users.getProfile({ userId: 'me' });
+  //const email = profile.data.emailAddress;
 
   if (!email) return res.status(401).send('User not authenticated');
 
