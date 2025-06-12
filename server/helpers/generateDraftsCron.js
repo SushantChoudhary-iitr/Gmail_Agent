@@ -195,7 +195,7 @@ async function generateDraftsForAllUsers() {
           const aiResponse = await openai.chat.completions.create({
             model: 'gpt-4o',
             messages: [
-              { role: 'system', content: `Write a reply as: \n${designation}, match the style and try to mimic on the basis of characterSummary:\n\n${characterSummary.join('\n---\n')}. match the tone,be clear, further cut down the "length" as this is a reply in the SAME THREAD so, Avoid being too formal, pompous, or wordy` },
+              { role: 'system', content: `Write a reply as: \n${designation}, match the style and try to mimic on the basis of characterSummary:\n\n${JSON.stringify(characterSummary,null,2)}. match the tone,be clear, further cut down the "length" as this is a reply in the SAME THREAD so, Avoid being too formal, pompous, or wordy` },
               { role: 'user', content: `Reply to this:\n\n${decodedBody}` },
             ],
           });
