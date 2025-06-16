@@ -171,7 +171,7 @@ async function generateDraftsForAllUsers() {
         }*/
 
           const requireReply = await openai.chat.completions.create({
-            model : 'gpt-4o',
+            model : 'gpt-3.5-turbo',
             messages:[
                 {role: 'system', content: 'you are an Email assistant, if an email requires a reply answer in yes or no, no punctuation marks.For no message body reply no'},
                 {role:'user', content: `from: ${from}\n subject: ${subject}\nbody: ${decodedBody} \n reply only if its from a real person, and its asking a question or needs a folow up response, No need to reply if its a social media notification or some company commercial, newsletter, ad, or system alert. /n does it need a reply?`},
@@ -229,12 +229,12 @@ async function generateDraftsForAllUsers() {
           { email },
           {
             $set: { lastRepliedTimestamp: Date.now() },
-            $push: {
+            /*$push: {
               chatHistory: [
                 { role: 'user', content: `reply this like me\n\n${decodedBody}` },
                 { role: 'assistant', content: aiReply }
               ]
-            }
+            }*/
           }
         );
 

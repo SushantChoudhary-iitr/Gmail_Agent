@@ -8,6 +8,7 @@ router.post('/preferences', async (req, res) => {
     console.log("HELLO");
   //const email = req.session?.user?.email;
   const  { designation, email }  = req.body;
+  console.log('req.body.email'+ email);
 
   const gmail = google.gmail({ version: 'v1', auth: oAuth2Client })
 

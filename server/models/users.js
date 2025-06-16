@@ -22,12 +22,12 @@ const userSchema = new mongoose.Schema({
     tone: { type: String, default: "informal" },
     signature: { type: String, default: "Regards, [NAME]" },
     length: { type: String, default: "very short" },
-    topics: { type: [String], default: [] },
     phrases: { type: [String], default: [] },
     emojis: { 
       used: {type: String, default: "false"},
       types: {type: [String], default:[]}
      },
+     specifics: { type: [String], default: [] },
     additionalNotes: { type: String, default: "" }
   },
   lastRepliedTimestamp: { type: Number, default: 0 }

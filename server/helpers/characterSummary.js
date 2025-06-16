@@ -21,12 +21,19 @@ async function analyzeReplies(replies){
     const systemPrompt = `
     You are an expert language analyst. Create a User Summary based on the previous replies provided, summarize based on the following: 
     1. Overall tone informal/friendly/semi-formal/or some other combination 
-    2. Signature style (e.g., "Regards, Name") 
+    2. Signature style (IF NO SIGNATURE THEN RETURN "Regards, [user's Name]") 
     3. Typical length (very short(1-15 words), short(15-30 words), medium(30-50)) 
-    4. User specific topics which concern their job(Their comapany), proffesion, any services they provide or consume, events they take part in(SPECIFIC TO USER ONLY)
-    5. Frequent phrases or patterns or slang (DO NOT UNECESSARILY PILE UP)
-    6. Any use of emojis, if yes store frequently used ones[ 😊,🔥,😅 ]
-    7. Additional NOTES (if you notice anything unique, you can save a few peculiar replies here)`.trim();
+    4. Frequent phrases or patterns or slang (DO NOT UNECESSARILY PILE UP)
+    5. Any use of emojis, if yes store frequently used ones[ 😊,🔥,😅,'frequency : 1/(no. of words)' ]
+    6. "specifics" — Most important: Identify **personal context** like:
+          - Where the user might be working/studying
+          - What projects/products they're working on
+          - Any deals, launches, transactions, or ongoing tasks mentioned
+          - Any current events or activities (e.g., hiring, relocating, collaborating)
+          - Product or company names mentioned
+          - Any behavioral patterns you can deduce about what's going on in the user's life
+          - DO NOT BLOAT THIS SECTION
+    7. Additional NOTES (if you notice anything unique, you can save a few peculiar replies here, but be short and efficient)`.trim();
 
     const chunkSummaries = [];
     
@@ -37,19 +44,19 @@ async function analyzeReplies(replies){
       "tone": "...",
       "signature": "...",
       "length": "...",
-      "topics": ["..."],
       "phrases": ["..."],
       "emojis": {
         "used": true/false,
-        "types": ["🔥"," 😊"]->only if true
+        "types": ["🔥"," 😊", "frequency: 1/(no. of words)]->only if true
       },
+      "specifics": ["..."],
       "additionalNotes": "..."
     } DO NOT MIX UP "topics" and "phrases"`.trim();
 
         try {
             console.log(`summarizing ${(i+20)/20}th chunk`);
             const completion = await openai.chat.completions.create({
-                model: 'gpt-4',
+                model: 'gpt-4o',
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: userPrompt }
@@ -103,19 +110,19 @@ async function analyzeReplies(replies){
       "tone": "...",
       "signature": "...",
       "length": "...",
-      "topics": ["..."],
       "phrases": ["..."],
       "emojis": {
             used : "true"/"false",
-            types: ["🔥"," 😊"]
+            types: ["🔥"," 😊","frequency: 1/(no. of words)"]
         },
+        "specifics": ["..."],
       "additionalNotes": "..."
     }`;
 
     try {
         console.log("into Merging");
         const mergeRes = await openai.chat.completions.create({
-            model: 'gpt-4',
+            model: 'gpt-4o',
             messages: [
                 { role: 'system', content: mergePromptSystem },
                 { role: 'user', content: mergePromptUser }
@@ -168,14 +175,17 @@ async function characterSummary(gmail) {
                 payload.body?.data ||
                 htmlPart?.body?.data;
 
-            if (!bodyData) continue;
+            if (!bodyData) {
+                console.log('skipping this mail has no body');
+                continue;
+            }
 
             let decoded = Buffer.from(bodyData, 'base64').toString('utf8');
             decoded = htmlToText(decoded); // in case it's HTML
             const visibleReply = parser.read(decoded).getVisibleText().trim();
 
             console.log(`sample MAIL: ${visibleReply}`);
-            return;
+            //return;
 
             if (visibleReply.length > 0) {
                 allReplies.push(visibleReply);
@@ -200,7 +210,7 @@ async function characterSummarySent(gmail){
             userId: 'me',
             labelIds: ['SENT'],
             q: `after:${threeWeeksAgo}`,
-            maxResults: 200,
+            maxResults: 500,
             pageToken: nextPageToken || undefined,
         });
     
@@ -224,16 +234,27 @@ async function characterSummarySent(gmail){
           if(!isReply) continue;
           console.log(`isReply: ${isReply}`);
       
-          const parts = msgRes.data.payload.parts || [];
+         /* const parts = msgRes.data.payload.parts || [];
           const bodyPart = parts.find(
             p => p.mimeType === 'text/plain' || p.mimeType === 'text/html'
-          );
+          );*/
+
+          const textPart = msgRes.data.payload.parts?.find(p => p.mimeType === 'text/plain');
+        const htmlPart = msgRes.data.payload.parts?.find(p => p.mimeType === 'text/html');
+        const bodyData = 
+          textPart?.body?.data ||
+          msgRes.data.payload.body?.data ||
+          htmlPart?.body?.data;
       
-          if (bodyPart?.body?.data) {
-            const decoded = Buffer.from(bodyPart.body.data, 'base64').toString('utf8');
+          if (bodyData) {
+            const decoded = Buffer.from(bodyData, 'base64').toString('utf8');
             const cleanText = extractVisibleReply(decoded);
+            console.log(`cleanText: ${cleanText}`);
             const timestamp = new Date(Number(msgRes.data.internalDate)).toLocaleString();
             if (cleanText.length > 0) replies.push(cleanText); // avoid empty or trivial replies
+          }
+          else{
+            console.log('no body data');
           }
         }
         
