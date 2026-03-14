@@ -1,5 +1,4 @@
-AI Email Reply Assistant
-
+AI Email Reply Assistant :
 An AI-powered email assistant that automatically analyzes incoming Gmail messages and generates contextual draft replies in the user’s writing style.
 The system connects to a user's Gmail account via OAuth, periodically scans the inbox for new messages, determines whether a reply is needed using AI, and creates draft responses that the user can review and send.
 
