@@ -36,7 +36,7 @@ function Preferences() {
           Draft Replies
         </Typography>
         <Typography variant="subtitle1" sx={{ mb: 2, color: '#666' }}>
-          Draft Prompt
+          Tell us about yourself and your role/designation
         </Typography>
         <TextField
           fullWidth
